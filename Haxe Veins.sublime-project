@@ -1,0 +1,25 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"name": "Haxe Veins",
+			"path": "C:\\Users\\AdmKasia/Haxe Veins"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Flixel",
+			"path": "F:\\roguelike\\development\\haxe\\HaxeToolkit\\haxe\\lib\\flixel/4,4,2/"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Flixel Addons",
+			"path": "F:\\roguelike\\development\\haxe\\HaxeToolkit\\haxe\\lib\\flixel-addons/2,6,0/"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Haxe",
+			"path": "F:\\roguelike\\development\\haxe\\HaxeToolkit\\haxe\\std"
+		}
+	]
+}
