@@ -5,8 +5,8 @@ import flixel.FlxG;
 
 class Entity extends FlxSprite {
 
-    var _x:Int;
-    var _y:Int;
+    public var _x:Int;
+    public var _y:Int;
 
     /**
      * Constructor
