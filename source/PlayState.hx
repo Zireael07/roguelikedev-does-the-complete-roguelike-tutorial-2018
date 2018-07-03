@@ -16,6 +16,10 @@ class PlayState extends FlxState
     //fractional so that cardinal directions do not "stick out"
     var fov_range:Float = 2.5;
 
+    var num_monsters:Int = 2;
+
+    var entities:Array<Entity> = [];
+
     override public function create():Void
 	{
 		super.create();
@@ -35,15 +39,23 @@ class PlayState extends FlxState
         fov = new FOV.Vision(game_map);
         fov.calculateShadowcast(x_start, y_start, fov_range);
 
+        //tilemap.drawMap(game_map, fov);
 
-        tilemap.drawMap(game_map, fov);
-
-
+        // monsters
+        for (i in 0 ... num_monsters) {
+            //we know that 0 and game_map.length-1 are guaranteed to be walls
+            var monster = new Entity(random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/kobold.png");
+            entities.push(monster);
+            add(monster);
+        }
 
         //sprite
-        player = new Entity(x_start, y_start);
+        player = new Entity(x_start, y_start, "assets/images/human_m.png");
 
         add(player);
+        entities.push(player);
+
+        drawAll(fov);
 	}
 
 	override public function update(elapsed:Float):Void
@@ -58,34 +70,87 @@ class PlayState extends FlxState
         
         if (FlxG.keys.anyJustPressed([LEFT, H]))
         {
-            player.move(-1,0, game_map);
-            fov.calculateShadowcast(player._x, player._y, fov_range);
-            tilemap.drawMap(game_map, fov);
+            if (getEntityAtLoc(player._x-1, player._y) != null)
+            {
+                trace("You push at the enemy!");
+            }
+            else
+            {
+                player.move(-1,0, game_map);
+                fov.calculateShadowcast(player._x, player._y, fov_range);
+                drawAll(fov);
+            }
+            
 
         }
         else if (FlxG.keys.anyJustPressed([RIGHT, L]))
         {
-            player.move(1,0, game_map);
-            fov.calculateShadowcast(player._x, player._y, fov_range);
-            tilemap.drawMap(game_map, fov);
+            if (getEntityAtLoc(player._x+1, player._y) != null)
+            {
+                trace("You push at the enemy!");
+            }
+            else{
+                player.move(1,0, game_map);
+                fov.calculateShadowcast(player._x, player._y, fov_range);
+                drawAll(fov);    
+            }
+            
 
         }
         else if (FlxG.keys.anyJustPressed([UP, K]))
         {
-            player.move(0,-1, game_map);
-            fov.calculateShadowcast(player._x, player._y, fov_range);
-            tilemap.drawMap(game_map, fov);
+            if (getEntityAtLoc(player._x, player._y-1) != null)
+            {
+                trace("You push at the enemy!");
+            }
+            else{
+                player.move(0,-1, game_map);
+                fov.calculateShadowcast(player._x, player._y, fov_range);
+                drawAll(fov);
+            }
         }
 
         else if (FlxG.keys.anyJustPressed([DOWN, J]))
         {
-            player.move(0,1, game_map);
-            fov.calculateShadowcast(player._x, player._y, fov_range);
-            tilemap.drawMap(game_map, fov);
-
+            if (getEntityAtLoc(player._x, player._y+1) != null)
+            {
+                trace("You push at the enemy!");
+            }
+            else{
+                player.move(0,1, game_map);
+                fov.calculateShadowcast(player._x, player._y, fov_range);
+                drawAll(fov);
+            }
         }
     }
     
+    public function drawAll(fov:FOV.Vision):Void {
+        tilemap.drawMap(game_map, fov);
+        
+        for (e in entities) {
+            e._draw(fov);
+        }
+    }
+
+
+    public function getEntityAtLoc(x:Int, y:Int):Entity {
+        var ret:Entity = null;
+
+        for (e in entities)
+        {
+            if (e._x == x && e._y == y)
+            {
+                ret = e;
+                break;
+            }
+            else
+            {
+                ret = null;
+            }
+        }
+
+        return ret;
+    }
 
     /**
      * Creates a matrix (2-dimensional array of Ints) of an empty map consisting of zeros only.
@@ -136,5 +201,11 @@ class PlayState extends FlxState
         return matrix;
     }
 
+    //randomness
+    /** Return a random integer between 'from' and 'to', inclusive. */
+    public static inline function random_int(from:Int, to:Int):Int
+    {
+        return from + Math.floor(((to - from + 1) * Math.random()));
+    }
 }
 

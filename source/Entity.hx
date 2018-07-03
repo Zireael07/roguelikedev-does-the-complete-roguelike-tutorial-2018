@@ -2,6 +2,7 @@ package;
 
 import flixel.FlxSprite;
 import flixel.FlxG;
+import flixel.system.FlxAssets.FlxGraphicAsset;
 
 class Entity extends FlxSprite {
 
@@ -14,12 +15,10 @@ class Entity extends FlxSprite {
      * @param   x
      * @param   y
      */
-    public function new(x:Int, y:Int):Void {
-        super(0,0, "assets/images/human_m.png");
+    public function new(x:Int, y:Int, ?SimpleGraphic:FlxGraphicAsset):Void {
+        super(0,0, SimpleGraphic);
         _x = x;
         _y = y;
-        _draw();
-
     }
 
     public function move(dx:Int, dy:Int, map:Array<Array<Int>>):Void
@@ -43,12 +42,27 @@ class Entity extends FlxSprite {
 
         _x += dx;
         _y += dy;
-        _draw();
+        //_draw();
+    }
+
+    public function isVisible(fov:FOV.Vision):Bool {
+        return (fov.lightMap[_x][_y] > 0);
     }
 
     // drawing functions
-    public function _draw():Void
+    public function _draw(fov:FOV.Vision):Void
     {
+        //are we visible?
+        if (isVisible(fov) == false){
+            this.visible = false;
+            return; //don't waste time calculating coords for non-visible sprites
+        }
+        else
+        {
+            this.visible = true;
+        }
+
+
         var _cartCoords:Array<Int> = cartesianCoords(_x, _y);
         var coords:Array<Int> = isoCoordsFromCartesian(_cartCoords[0], _cartCoords[1]);
 
