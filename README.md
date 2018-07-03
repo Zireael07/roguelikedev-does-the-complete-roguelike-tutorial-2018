@@ -15,3 +15,11 @@ We're already doing graphics, and isometric graphics at that. Check out https://
 The map is dead simple because the HaxeFlixel window is very small at default settings. Need to figure out a camera first before using a classic BSP map.
 
 Haxe doesn't seem to have global functions, and it definitely doesn't have top-level functions (everything has to be in a class), so there is a tiny bit of code repetition so far.
+
+## Week 3
+
+Moved the isometric map rendering code to a separate class and used FlxGroup to ensure that the map gets drawn before the player.
+
+The FOV is recursive shadowcasting, ported from Java (SquidLib) to Haxe. This algorithm, according to all sources, is easiest to understand and implement, but it's downside is the lack of symmetry. For tutorial purposes, it's however good enough.
+
+Due to HTML5 WebGL errors when tinting sprites, if you are using the sources, you need to use *lime build html5 -Dcanvas* to force canvas rendering. Other targets work fine.
