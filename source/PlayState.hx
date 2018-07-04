@@ -30,7 +30,7 @@ class PlayState extends FlxState
         //add(text);
 
         //a simple map
-        game_map = generateArenaMatrix(8,8);
+        game_map = generateArenaMatrix(20,20);
 
         tilemap = new IsoTilemap(game_map);
         add(tilemap._Layer);
@@ -56,6 +56,9 @@ class PlayState extends FlxState
         entities.push(player);
 
         drawAll(fov);
+
+        //camera
+        FlxG.camera.follow(player, LOCKON, 1);
 	}
 
 	override public function update(elapsed:Float):Void

@@ -93,7 +93,7 @@ class IsoTilemap {
         var offset = Math.round(FlxG.stage.stageWidth/2);
 
         // taken from "An updated primer for creating isometric worlds" tutorial
-        var isoX = x - y + offset;
+        var isoX = x - y; //+ offset;
         var _isoY:Float = (x + y) / 2; //always returns a float 
 
         
