@@ -8,17 +8,40 @@ class Entity extends FlxSprite {
 
     public var _x:Int;
     public var _y:Int;
+    var name:String;
+
+    //optional
+    public var _ai(default, null):AI;
+    public var _actor(default, null):Components.Actor;
 
     /**
      * Constructor
      * @param name
      * @param   x
      * @param   y
+     * @param actor
+     * @param ai
      */
-    public function new(x:Int, y:Int, ?SimpleGraphic:FlxGraphicAsset):Void {
+    public function new(x:Int, y:Int, ?SimpleGraphic:FlxGraphicAsset, ?actor:Components.Actor, ?ai:AI):Void {
         super(0,0, SimpleGraphic);
         _x = x;
         _y = y;
+        _ai = ai;
+        _actor = actor;
+
+
+        if (_actor != null){
+            _actor.owner = this;
+        }
+
+        if (ai != null){
+            _ai.owner = this;
+        }
+
+        if (_ai != null){
+            trace("Has AI", _ai);
+        }
+        
     }
 
     public function move(dx:Int, dy:Int, map:Array<Array<Int>>):Void
@@ -44,6 +67,48 @@ class Entity extends FlxSprite {
         _y += dy;
         //_draw();
     }
+
+    public function move_towards(target_x:Int, target_y:Int, map:Array<Array<Int>>, entities:Array<Entity>):Void {
+        var dx = target_x - _x;
+        var dy = target_y - _y;
+        var distance = Math.sqrt(Math.abs(dx) * 2 + Math.abs(dy) * 2);
+
+        dx = (Math.round(dx / distance));
+        dy = (Math.round(dy / distance));
+
+        if (getEntityAtLoc(dx, dy, entities) == null){
+            move(dx, dy, map);
+        }
+    }
+
+
+    public function getEntityAtLoc(x:Int, y:Int, entities:Array<Entity>):Entity {
+        var ret:Entity = null;
+
+        for (e in entities)
+        {
+            if (e._x == x && e._y == y)
+            {
+                ret = e;
+                break;
+            }
+            else
+            {
+                ret = null;
+            }
+        }
+
+        return ret;
+    }
+
+    public function distanceTo(target:Array<Int>):Float {
+        var dx = Math.abs(target[0] - _x);
+        var dy = Math.abs(target[1] - _y);
+        //trace(dx, " ", dy);
+        //trace("Distance: ", Math.sqrt(dx * 2 + dy * 2));
+        return Math.sqrt(dx * 2 + dy * 2);
+    }
+
 
     public function isVisible(fov:FOV.Vision):Bool {
         return (fov.lightMap[_x][_y] > 0);

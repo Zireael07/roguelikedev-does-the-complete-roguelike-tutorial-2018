@@ -18,7 +18,7 @@ class PlayState extends FlxState
 
     var num_monsters:Int = 2;
 
-    var entities:Array<Entity> = [];
+    public var entities:Array<Entity> = [];
 
     override public function create():Void
 	{
@@ -43,14 +43,17 @@ class PlayState extends FlxState
 
         // monsters
         for (i in 0 ... num_monsters) {
+            var mon_actor = new Components.Actor(5,11,10);
+            var mon_ai = new AI();
             //we know that 0 and game_map.length-1 are guaranteed to be walls
-            var monster = new Entity(random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/kobold.png");
+            var monster = new Entity(random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/kobold.png", mon_actor, mon_ai);
             entities.push(monster);
             add(monster);
         }
 
         //sprite
-        player = new Entity(x_start, y_start, "assets/images/human_m.png");
+        var player_actor = new Components.Actor(30, 12, 10);
+        player = new Entity(x_start, y_start, "assets/images/human_m.png", player_actor);
 
         add(player);
         entities.push(player);
@@ -73,13 +76,23 @@ class PlayState extends FlxState
         
         if (FlxG.keys.anyJustPressed([LEFT, H]))
         {
-            if (getEntityAtLoc(player._x-1, player._y) != null)
+            if (player.getEntityAtLoc(player._x-1, player._y, entities) != null)
             {
-                trace("You push at the enemy!");
+                player._actor.attack(player.getEntityAtLoc(player._x-1, player._y, entities));
+                //trace("You push at the enemy!");
             }
             else
             {
                 player.move(-1,0, game_map);
+
+                //AI moves
+                for (e in entities)
+                {
+                    if (e._ai != null){
+                        e._ai.take_turn(player, game_map, entities);
+                    }
+                }
+
                 fov.calculateShadowcast(player._x, player._y, fov_range);
                 drawAll(fov);
             }
@@ -88,12 +101,22 @@ class PlayState extends FlxState
         }
         else if (FlxG.keys.anyJustPressed([RIGHT, L]))
         {
-            if (getEntityAtLoc(player._x+1, player._y) != null)
+            if (player.getEntityAtLoc(player._x+1, player._y, entities) != null)
             {
-                trace("You push at the enemy!");
+                //trace("You push at the enemy!");
+                player._actor.attack(player.getEntityAtLoc(player._x+1, player._y, entities));
             }
             else{
                 player.move(1,0, game_map);
+
+                //AI moves
+                for (e in entities)
+                {
+                    if (e._ai != null){
+                        e._ai.take_turn(player, game_map, entities);
+                    }
+                }
+
                 fov.calculateShadowcast(player._x, player._y, fov_range);
                 drawAll(fov);    
             }
@@ -102,12 +125,22 @@ class PlayState extends FlxState
         }
         else if (FlxG.keys.anyJustPressed([UP, K]))
         {
-            if (getEntityAtLoc(player._x, player._y-1) != null)
+            if (player.getEntityAtLoc(player._x, player._y-1, entities) != null)
             {
-                trace("You push at the enemy!");
+                //trace("You push at the enemy!");
+                player._actor.attack(player.getEntityAtLoc(player._x, player._y-1, entities));
             }
             else{
                 player.move(0,-1, game_map);
+
+                //AI moves
+                for (e in entities)
+                {
+                    if (e._ai != null){
+                        e._ai.take_turn(player, game_map, entities);
+                    }
+                }
+
                 fov.calculateShadowcast(player._x, player._y, fov_range);
                 drawAll(fov);
             }
@@ -115,12 +148,22 @@ class PlayState extends FlxState
 
         else if (FlxG.keys.anyJustPressed([DOWN, J]))
         {
-            if (getEntityAtLoc(player._x, player._y+1) != null)
+            if (player.getEntityAtLoc(player._x, player._y+1, entities) != null)
             {
-                trace("You push at the enemy!");
+                //trace("You push at the enemy!");
+                player._actor.attack(player.getEntityAtLoc(player._x, player._y+1, entities));
             }
             else{
                 player.move(0,1, game_map);
+
+                //AI moves
+                for (e in entities)
+                {
+                    if (e._ai != null){
+                        e._ai.take_turn(player, game_map, entities);
+                    }
+                }
+
                 fov.calculateShadowcast(player._x, player._y, fov_range);
                 drawAll(fov);
             }
@@ -136,24 +179,6 @@ class PlayState extends FlxState
     }
 
 
-    public function getEntityAtLoc(x:Int, y:Int):Entity {
-        var ret:Entity = null;
-
-        for (e in entities)
-        {
-            if (e._x == x && e._y == y)
-            {
-                ret = e;
-                break;
-            }
-            else
-            {
-                ret = null;
-            }
-        }
-
-        return ret;
-    }
 
     /**
      * Creates a matrix (2-dimensional array of Ints) of an empty map consisting of zeros only.
