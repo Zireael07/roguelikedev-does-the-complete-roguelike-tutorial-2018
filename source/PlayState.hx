@@ -9,6 +9,8 @@ class PlayState extends FlxState
     var x_start:Int = 2;
     var y_start:Int = 2;
     var player:Entity;
+    var ui:UI;
+    var messages:GameMessages.MessageLog;
     var game_map:Array<Array<Int>>;
     var tilemap:IsoTilemap;
 
@@ -58,6 +60,14 @@ class PlayState extends FlxState
         add(player);
         entities.push(player);
 
+
+        ui = new UI();
+        add(ui._Layer);
+        add(ui._msgLayer);
+
+        //we made it static so we don't need an instance
+        //messages = new GameMessages.MessageLog(20, 100, 5);
+
         drawAll(fov);
 
         //camera
@@ -66,7 +76,23 @@ class PlayState extends FlxState
 
 	override public function update(elapsed:Float):Void
 	{
-		updatePlayer();
+		ui.update();
+        updatePlayer();
+
+        var y = 300;
+        if (GameMessages.MessageLog._messages.length > 0)
+        {
+            for (msg in GameMessages.MessageLog._messages)
+            {
+                trace("should show", msg._txt);
+                var txt = new flixel.text.FlxText(FlxG.camera.scroll.x+10,FlxG.camera.scroll.y+y, 0, msg._txt, 16);
+                ui._msgLayer.add(txt);
+                y += 18;
+            }    
+        }
+        
+            
+
         super.update(elapsed);
 	}
 

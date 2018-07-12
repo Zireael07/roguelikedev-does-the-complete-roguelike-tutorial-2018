@@ -23,7 +23,10 @@ class Actor {
         if (damage > 0)
         {
             target._actor.takeDamage(damage);
-            trace("Attacked for ", damage, " hit points");
+            var str = new String("Attacked for " + damage + " hp! ");
+            var msg = new GameMessages.GameMessage(str);
+            GameMessages.MessageLog.addMessage(msg);
+            //trace("Attacked for ", damage, " hit points");
         }
         else
         {
