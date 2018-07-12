@@ -23,3 +23,7 @@ Moved the isometric map rendering code to a separate class and used FlxGroup to 
 The FOV is recursive shadowcasting, ported from Java (SquidLib) to Haxe. This algorithm, according to all sources, is easiest to understand and implement, but it's downside is the lack of symmetry. For tutorial purposes, it's however good enough.
 
 Due to HTML5 WebGL errors when tinting sprites, if you are using the sources, you need to use *lime build html5 -Dcanvas* to force canvas rendering. Other targets work fine.
+
+## Week 4
+
+The UI flickers when you move because in HaxeFlixel, everything is drawn in world space. Need to figure out how to avoid that flickering, though.
