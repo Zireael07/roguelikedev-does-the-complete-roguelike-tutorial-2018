@@ -13,6 +13,8 @@ class Entity extends FlxSprite {
     //optional
     public var _ai(default, null):AI;
     public var _actor(default, null):Components.Actor;
+    public var _item(default, null):Components.Item;
+    public var _inventory(default, null):Components.Inventory;
 
     /**
      * Constructor
@@ -21,14 +23,17 @@ class Entity extends FlxSprite {
      * @param   y
      * @param actor
      * @param ai
+     * @param item
+     * @param inventory
      */
-    public function new(x:Int, y:Int, ?SimpleGraphic:FlxGraphicAsset, ?actor:Components.Actor, ?ai:AI):Void {
+    public function new(x:Int, y:Int, ?SimpleGraphic:FlxGraphicAsset, ?actor:Components.Actor, ?ai:AI, ?item:Components.Item, ?inventory:Components.Inventory):Void {
         super(0,0, SimpleGraphic);
         _x = x;
         _y = y;
         _ai = ai;
         _actor = actor;
-
+        _item = item;
+        _inventory = inventory;
 
         if (_actor != null){
             _actor.owner = this;
@@ -36,6 +41,14 @@ class Entity extends FlxSprite {
 
         if (ai != null){
             _ai.owner = this;
+        }
+
+        if (item != null){
+            _item.owner = this;
+        }
+
+        if (inventory != null){
+            _inventory.owner = this;
         }
 
         if (_ai != null){
@@ -98,6 +111,34 @@ class Entity extends FlxSprite {
             }
         }
 
+        return ret;
+    }
+
+    public function getActorAtLoc(x:Int, y:Int, entities:Array<Entity>):Entity {
+        var ret:Entity = null;
+
+        var loc = getEntityAtLoc(x,y,entities);
+
+        if (loc != null && loc._actor != null){
+            ret = loc;
+        }
+        else{
+            ret = null;
+        }
+        return ret;
+    }
+
+    public function getItemAtLoc(x:Int, y:Int, entities:Array<Entity>):Entity {
+        var ret:Entity = null;
+
+        var loc = getEntityAtLoc(x,y,entities);
+
+        if (loc != null && loc._item != null){
+            ret = loc;
+        }
+        else{
+            ret = null;
+        }
         return ret;
     }
 

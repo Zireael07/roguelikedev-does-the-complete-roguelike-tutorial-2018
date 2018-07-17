@@ -19,6 +19,7 @@ class PlayState extends FlxState
     var fov_range:Float = 2.5;
 
     var num_monsters:Int = 2;
+    var num_items:Int = 2;
 
     public var entities:Array<Entity> = [];
 
@@ -53,9 +54,19 @@ class PlayState extends FlxState
             add(monster);
         }
 
-        //sprite
+        // items
+        for (i in 0 ... num_items){
+            var item_c = new Components.Item();
+            var item = new Entity(random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/potion.png", item_c);
+            entities.push(item);
+            add(item);
+        }
+
+
+        //player
+        var inventory = new Components.Inventory(26);
         var player_actor = new Components.Actor(30, 12, 10);
-        player = new Entity(x_start, y_start, "assets/images/human_m.png", player_actor);
+        player = new Entity(x_start, y_start, "assets/images/human_m.png", player_actor, inventory);
 
         add(player);
         entities.push(player);
@@ -102,7 +113,7 @@ class PlayState extends FlxState
         
         if (FlxG.keys.anyJustPressed([LEFT, H]))
         {
-            if (player.getEntityAtLoc(player._x-1, player._y, entities) != null)
+            if (player.getActorAtLoc(player._x-1, player._y, entities) != null)
             {
                 player._actor.attack(player.getEntityAtLoc(player._x-1, player._y, entities));
                 //trace("You push at the enemy!");
@@ -127,7 +138,7 @@ class PlayState extends FlxState
         }
         else if (FlxG.keys.anyJustPressed([RIGHT, L]))
         {
-            if (player.getEntityAtLoc(player._x+1, player._y, entities) != null)
+            if (player.getActorAtLoc(player._x+1, player._y, entities) != null)
             {
                 //trace("You push at the enemy!");
                 player._actor.attack(player.getEntityAtLoc(player._x+1, player._y, entities));
@@ -151,7 +162,7 @@ class PlayState extends FlxState
         }
         else if (FlxG.keys.anyJustPressed([UP, K]))
         {
-            if (player.getEntityAtLoc(player._x, player._y-1, entities) != null)
+            if (player.getActorAtLoc(player._x, player._y-1, entities) != null)
             {
                 //trace("You push at the enemy!");
                 player._actor.attack(player.getEntityAtLoc(player._x, player._y-1, entities));
@@ -174,7 +185,7 @@ class PlayState extends FlxState
 
         else if (FlxG.keys.anyJustPressed([DOWN, J]))
         {
-            if (player.getEntityAtLoc(player._x, player._y+1, entities) != null)
+            if (player.getActorAtLoc(player._x, player._y+1, entities) != null)
             {
                 //trace("You push at the enemy!");
                 player._actor.attack(player.getEntityAtLoc(player._x, player._y+1, entities));
@@ -194,6 +205,48 @@ class PlayState extends FlxState
                 drawAll(fov);
             }
         }
+        else if (FlxG.keys.anyJustPressed([G]))
+        {
+            var it = player.getItemAtLoc(player._x, player._y, entities);
+            if (it != null)
+            {
+                //remove from screen
+                remove(it);
+                it.kill();
+                player._inventory.addItem(it);
+                //remove from entities
+                entities.remove(it);
+
+                //AI moves
+                for (e in entities)
+                {
+                    if (e._ai != null){
+                        e._ai.take_turn(player, game_map, entities);
+                    }
+                }
+
+                fov.calculateShadowcast(player._x, player._y, fov_range);
+                drawAll(fov);
+
+            }
+            else{
+                var str = new String("No item here to pick up");
+                var msg = new GameMessages.GameMessage(str);
+                GameMessages.MessageLog.addMessage(msg);
+
+                //AI moves
+                for (e in entities)
+                {
+                    if (e._ai != null){
+                        e._ai.take_turn(player, game_map, entities);
+                    }
+                }
+
+                fov.calculateShadowcast(player._x, player._y, fov_range);
+                drawAll(fov);
+            }
+        }
+
     }
     
     public function drawAll(fov:FOV.Vision):Void {

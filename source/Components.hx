@@ -34,3 +34,37 @@ class Actor {
         }
     }
 }
+
+class Item {
+    public var owner:Entity;
+
+    public function new():Void {
+        
+    }
+}
+
+class Inventory {
+    var capacity:Int;
+    var items:Array<Entity> = [];
+
+    public var owner:Entity;
+
+    public function new(cap:Int):Void {
+        capacity = cap;
+    }
+
+    public function addItem(item:Entity):Void {
+        if (items.length >= capacity){
+            var str = new String("Cannot carry any more!");
+            var msg = new GameMessages.GameMessage(str);
+            GameMessages.MessageLog.addMessage(msg);
+        }
+        else{
+            var str = new String("You picked up an item!");
+            var msg = new GameMessages.GameMessage(str);
+            GameMessages.MessageLog.addMessage(msg);
+
+            items.push(item);
+        }
+    }
+}
