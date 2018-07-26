@@ -96,8 +96,10 @@ class PlayState extends FlxState
             for (msg in GameMessages.MessageLog._messages)
             {
                 trace("should show", msg._txt);
-                var txt = new flixel.text.FlxText(FlxG.camera.scroll.x+10,FlxG.camera.scroll.y+y, 0, msg._txt, 16);
-                ui._msgLayer.add(txt);
+                var txt = new flixel.text.FlxText(10,y, 0, msg._txt, 16);
+                ui._msgLayer.add(txt);        
+                // HUD elements shouldn't move with the camera
+                txt.scrollFactor.set(0, 0);
                 y += 18;
             }    
         }
