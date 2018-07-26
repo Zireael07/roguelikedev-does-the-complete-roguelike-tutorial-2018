@@ -45,7 +45,7 @@ class Item {
 
 class Inventory {
     var capacity:Int;
-    var items:Array<Entity> = [];
+    public var items:Array<Entity> = [];
 
     public var owner:Entity;
 

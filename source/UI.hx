@@ -20,6 +20,7 @@ class UI {
         //super();
         this._Layer = new FlxTypedGroup<FlxSprite>();
         this._msgLayer = new flixel.group.FlxGroup();
+
         setupUI();
     }
 
@@ -40,6 +41,44 @@ class UI {
         });
 
         setup = true;
+    }
+
+    public function menu(layer:flixel.group.FlxGroup, x:Int, y:Int, header:String, items:Array<String>):Void {
+        trace("Menu items", items);
+
+
+        if (items.length > 26) { trace("Too many menu entries"); return; }
+
+
+        var txt = new flixel.text.FlxText(x,y, 0, header, 18);
+        layer.add(txt);
+        txt.scrollFactor.set(0, 0);
+
+        y = y + 20;
+        for (i in items){
+            var txt = new flixel.text.FlxText(x,y, 0, i, 16);
+            layer.add(txt);
+            txt.scrollFactor.set(0, 0);
+            y = y + 18;
+        }
+
+    }
+
+    public function inventoryMenu(items:Array<Entity>):flixel.group.FlxGroup {
+        var names = new Array<String>();
+
+        trace("Items passed: ", items);
+
+        for (i in items){
+            trace("Pushing names to list: ", i._name);
+            names.push(i._name);
+        }
+
+
+        var grp = new flixel.group.FlxGroup();
+        menu(grp, 50, 40, new String("INVENTORY"), names);
+        
+        return grp;
     }
 
     //override public function update(elapsed:Float):Void {

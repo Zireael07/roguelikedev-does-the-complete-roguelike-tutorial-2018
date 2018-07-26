@@ -23,6 +23,9 @@ class PlayState extends FlxState
 
     public var entities:Array<Entity> = [];
 
+    var ui_overlays:Array<flixel.group.FlxGroup> = [];
+    var open_inv = false;
+
     override public function create():Void
 	{
 		super.create();
@@ -49,7 +52,7 @@ class PlayState extends FlxState
             var mon_actor = new Components.Actor(5,11,10);
             var mon_ai = new AI();
             //we know that 0 and game_map.length-1 are guaranteed to be walls
-            var monster = new Entity(random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/kobold.png", mon_actor, mon_ai);
+            var monster = new Entity("kobold", random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/kobold.png", mon_actor, mon_ai);
             entities.push(monster);
             add(monster);
         }
@@ -57,7 +60,7 @@ class PlayState extends FlxState
         // items
         for (i in 0 ... num_items){
             var item_c = new Components.Item();
-            var item = new Entity(random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/potion.png", item_c);
+            var item = new Entity("potion", random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/potion.png", item_c);
             entities.push(item);
             add(item);
         }
@@ -66,7 +69,7 @@ class PlayState extends FlxState
         //player
         var inventory = new Components.Inventory(26);
         var player_actor = new Components.Actor(30, 12, 10);
-        player = new Entity(x_start, y_start, "assets/images/human_m.png", player_actor, inventory);
+        player = new Entity("player", x_start, y_start, "assets/images/human_m.png", player_actor, inventory);
 
         add(player);
         entities.push(player);
@@ -248,7 +251,22 @@ class PlayState extends FlxState
                 drawAll(fov);
             }
         }
+        else if (FlxG.keys.anyJustPressed([I]) && open_inv == false)
+        {
+            var layer = ui.inventoryMenu(player._inventory.items);
+            trace("Should show inventory");
+            add(layer);
+            ui_overlays.push(layer);
+            open_inv = true;
+        }
+        else if (FlxG.keys.anyJustPressed([Q]) && open_inv == true){
+            open_inv = false;
+            var inv_layer = ui_overlays[0];
+            inv_layer.kill();
+            ui_overlays.remove(inv_layer);
+            trace("Should close inventory");
 
+        }
     }
     
     public function drawAll(fov:FOV.Vision):Void {

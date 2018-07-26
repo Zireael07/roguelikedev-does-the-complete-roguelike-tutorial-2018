@@ -8,7 +8,7 @@ class Entity extends FlxSprite {
 
     public var _x:Int;
     public var _y:Int;
-    var name:String;
+    public var _name:String;
 
     //optional
     public var _ai(default, null):AI;
@@ -26,8 +26,9 @@ class Entity extends FlxSprite {
      * @param item
      * @param inventory
      */
-    public function new(x:Int, y:Int, ?SimpleGraphic:FlxGraphicAsset, ?actor:Components.Actor, ?ai:AI, ?item:Components.Item, ?inventory:Components.Inventory):Void {
+    public function new(name:String, x:Int, y:Int, ?SimpleGraphic:FlxGraphicAsset, ?actor:Components.Actor, ?ai:AI, ?item:Components.Item, ?inventory:Components.Inventory):Void {
         super(0,0, SimpleGraphic);
+        _name = name;
         _x = x;
         _y = y;
         _ai = ai;
@@ -53,6 +54,12 @@ class Entity extends FlxSprite {
 
         if (_ai != null){
             trace("Has AI", _ai);
+        }
+        if (this._name != null){
+            trace(this._name);
+        }
+        else{
+            trace("No name set");
         }
         
     }
