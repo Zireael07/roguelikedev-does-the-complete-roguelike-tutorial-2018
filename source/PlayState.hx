@@ -2,6 +2,7 @@ package;
 
 import flixel.FlxState;
 import flixel.FlxG;
+import flixel.util.FlxSave;
 
 class PlayState extends FlxState
 {
@@ -22,13 +23,23 @@ class PlayState extends FlxState
     var num_items:Int = 2;
 
     public var entities:Array<Entity> = [];
+    var entities_group:flixel.group.FlxGroup;
 
     var ui_overlays:Array<flixel.group.FlxGroup> = [];
     var open_inv = false;
 
+    // Here's the FlxSave variable that we're going to be saving to.
+    var _gameSave:FlxSave;
+
     override public function create():Void
 	{
 		super.create();
+
+        // you have to instantiate a new one before you can use it
+        _gameSave = new FlxSave();
+        // And then you have to bind it to the save data, you can use different bind strings in different parts of your game
+        // you MUST bind the save before it can be used.
+        _gameSave.bind("SaveDemo");
 
         //hello world
         //var text = new flixel.text.FlxText(0, 0, 0, "Hello World", 64);
@@ -47,6 +58,8 @@ class PlayState extends FlxState
 
         //tilemap.drawMap(game_map, fov);
 
+        entities_group = new flixel.group.FlxGroup();
+
         // monsters
         for (i in 0 ... num_monsters) {
             var mon_actor = new Components.Actor(5,11,10);
@@ -54,7 +67,7 @@ class PlayState extends FlxState
             //we know that 0 and game_map.length-1 are guaranteed to be walls
             var monster = new Entity("kobold", random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/kobold.png", mon_actor, mon_ai);
             entities.push(monster);
-            add(monster);
+            entities_group.add(monster);
         }
 
         // items
@@ -62,7 +75,7 @@ class PlayState extends FlxState
             var item_c = new Components.Item();
             var item = new Entity("potion", random_int(1, game_map[0].length-2), random_int(1, game_map.length-2), "assets/images/potion.png", item_c);
             entities.push(item);
-            add(item);
+            entities_group.add(item);
         }
 
 
@@ -71,9 +84,10 @@ class PlayState extends FlxState
         var player_actor = new Components.Actor(30, 12, 10);
         player = new Entity("player", x_start, y_start, "assets/images/human_m.png", player_actor, inventory);
 
-        add(player);
+        entities_group.add(player);
         entities.push(player);
 
+        add(entities_group);
 
         ui = new UI();
         add(ui._Layer);
@@ -98,7 +112,7 @@ class PlayState extends FlxState
         {
             for (msg in GameMessages.MessageLog._messages)
             {
-                trace("should show", msg._txt);
+                //trace("should show", msg._txt);
                 var txt = new flixel.text.FlxText(10,y, 0, msg._txt, 16);
                 ui._msgLayer.add(txt);        
                 // HUD elements shouldn't move with the camera
@@ -165,7 +179,8 @@ class PlayState extends FlxState
             
 
         }
-        else if (FlxG.keys.anyJustPressed([UP, K]))
+        // it picks up the K in Shift+Ctrl+K to open browser console
+        else if (FlxG.keys.anyJustPressed([UP]))
         {
             if (player.getActorAtLoc(player._x, player._y-1, entities) != null)
             {
@@ -267,8 +282,78 @@ class PlayState extends FlxState
             trace("Should close inventory");
 
         }
+        //save-load
+        else if (FlxG.keys.anyJustPressed([S]))
+        {
+            save();
+        }
+        else if (FlxG.keys.anyJustPressed([O]))
+        {
+            load();
+            //redraw
+            fov.calculateShadowcast(player._x, player._y, fov_range);
+            drawAll(fov);
+        }
     }
     
+    public function save():Void {
+        trace("Saving game...");
+        //_gameSave.data.player_pos = new Array();
+        //_gameSave.data.player_pos.push(player._x);
+        //_gameSave.data.player_pos.push(player._y);
+        _gameSave.data.player_items = new Array();
+        _gameSave.data.player_items = player._inventory.items.copy();
+        //trace("Items: ", _gameSave.data.player_items);
+        _gameSave.data.entities_pos = new Array();
+        // entities_group.members is always updated, so we can't retrieve data from the moment of saving
+        //_gameSave.data.entities = entities_group.members.copy();
+        for (e_id in 0...entities.length){
+            trace("Saving entity..", entities[e_id]);
+            var pos = new Array<Int>();
+            var e = entities[e_id];
+            pos.push(e._x);
+            pos.push(e._y);
+            trace("Saved...", pos);
+            _gameSave.data.entities_pos.push(pos);
+        }
+        //trace("Player id", entities_group.members.indexOf(player));
+        //trace("Player", player);
+    }
+
+    public function load():Void {
+        trace("Loading game...");
+        if (_gameSave.data.entities_pos != null)
+        {
+            trace("Loaded game");
+
+            for (id in 0..._gameSave.data.entities_pos.length){
+                trace("Loaded entity id", id, "entity:", _gameSave.data.entities_pos[id]);
+                if (id < entities.length){
+                //for (e_id in 0...entities.length){
+                    var e = entities[id];
+                    e._x = _gameSave.data.entities_pos[id][0];
+                    e._y = _gameSave.data.entities_pos[id][1];
+                    trace("Setting entity", id, " to ", e._x, e._y);
+                }
+            }
+
+            //very basic
+            //player._x = _gameSave.data.player_pos[0];
+            //player._y = _gameSave.data.player_pos[1];
+            //trace("Position: ", _gameSave.data.player_pos[0], _gameSave.data.player_pos[1]);
+            //trace("Setting player to saved position", player._x, player._y);
+            trace("Items in save", _gameSave.data.player_items);
+            //clear array
+            player._inventory.items = [];
+            for (id in 0 ..._gameSave.data.player_items.length){
+                player._inventory.items.push(_gameSave.data.player_items[id]);
+            }
+            // doesn't work because loaded data is Dynamic
+            //player._inventory.items = _gameSave.data.player_items.copy();
+        }
+    }
+
+
     public function drawAll(fov:FOV.Vision):Void {
         tilemap.drawMap(game_map, fov);
         
