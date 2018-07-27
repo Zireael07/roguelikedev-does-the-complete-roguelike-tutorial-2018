@@ -27,3 +27,14 @@ Due to HTML5 WebGL errors when tinting sprites, if you are using the sources, yo
 ## Week 4
 
 The UI flickers when you move because in HaxeFlixel, everything is drawn in world space. Need to figure out how to avoid that flickering, though.
+
+## Week 5
+
+Very simple UI is drawn and ignores camera movement.
+
+
+## Week 6
+
+Moved all the entity sprites to separate group to make working with them easier.
+
+I implemented the simplest save/load possible by using FlxSave and saving only the positions. For more complex games, serializing the Entity class will be necessary.
