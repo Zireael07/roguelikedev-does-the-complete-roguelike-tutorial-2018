@@ -15,6 +15,7 @@ class IsoTilemap {
     var SpriteByInt = [
         0 => AssetPaths.floor_sand__png,
         1 => AssetPaths.wall_stone__png,
+        2 => AssetPaths.stairs_down__png,
     ];
 
     public function new(game_map:Array<Array<Int>>):Void 

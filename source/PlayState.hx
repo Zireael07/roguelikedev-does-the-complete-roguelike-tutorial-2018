@@ -48,6 +48,7 @@ class PlayState extends FlxState
 
         //a simple map
         game_map = generateArenaMatrix(20,20);
+        placeStairs(game_map);
 
         tilemap = new IsoTilemap(game_map);
         add(tilemap._Layer);
@@ -225,6 +226,15 @@ class PlayState extends FlxState
                 drawAll(fov);
             }
         }
+        else if (FlxG.keys.anyJustPressed([PERIOD]))
+        {
+            if (game_map[player._y][player._x] == 2)
+            {
+                trace("Should be changing levels...");
+                nextFloor();
+                drawAll(fov);
+            }
+        }
         else if (FlxG.keys.anyJustPressed([G]))
         {
             var it = player.getItemAtLoc(player._x, player._y, entities);
@@ -287,13 +297,14 @@ class PlayState extends FlxState
         {
             save();
         }
-        else if (FlxG.keys.anyJustPressed([O]))
+        else if (FlxG.keys.anyJustPressed([SHIFT]) && FlxG.keys.anyJustPressed([L]))
         {
             load();
             //redraw
             fov.calculateShadowcast(player._x, player._y, fov_range);
             drawAll(fov);
         }
+
     }
     
     public function save():Void {
@@ -412,6 +423,38 @@ class PlayState extends FlxState
 
         return matrix;
     }
+
+
+    public static function placeStairs(game_map:Array<Array<Int>>):Void {
+        var pos = new Array<Int>();
+        //we know that 0 and game_map.length-1 are guaranteed to be walls
+        
+        pos.push(random_int(1, game_map[0].length-2));
+        pos.push(random_int(1, game_map.length-2));
+
+        game_map[pos[0]][pos[1]] = 2;
+    }
+
+    public function nextFloor():Void {
+        var str = new String("You descend a level");
+        var msg = new GameMessages.GameMessage(str);
+        GameMessages.MessageLog.addMessage(msg);
+
+
+        //dungeon_level += 1;
+        
+        entities = [];
+        entities.push(player);
+
+        //a simple map
+        game_map = generateArenaMatrix(20,20);
+        placeStairs(game_map);
+
+        //fov
+        fov = new FOV.Vision(game_map);
+        fov.calculateShadowcast(player._x, player._y, fov_range);
+    }
+
 
     //randomness
     /** Return a random integer between 'from' and 'to', inclusive. */
