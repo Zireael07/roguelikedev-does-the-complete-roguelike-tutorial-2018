@@ -16,6 +16,8 @@ class Entity extends FlxSprite {
     public var _item(default, null):Components.Item;
     public var _inventory(default, null):Components.Inventory;
 
+    public var dead:Bool;
+
     /**
      * Constructor
      * @param name
@@ -96,7 +98,7 @@ class Entity extends FlxSprite {
         dx = (Math.round(dx / distance));
         dy = (Math.round(dy / distance));
 
-        if (getEntityAtLoc(dx, dy, entities) == null){
+        if (getActorAtLoc(_x+dx, _y+dy, entities) == null){
             move(dx, dy, map);
         }
     }

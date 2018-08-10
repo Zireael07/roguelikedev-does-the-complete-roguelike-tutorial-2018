@@ -106,7 +106,18 @@ class PlayState extends FlxState
 	override public function update(elapsed:Float):Void
 	{
 		ui.update();
-        updatePlayer();
+        kills();
+
+        if (!player.dead){
+            updatePlayer();
+        }
+        else
+        {
+            var text = new flixel.text.FlxText(0,0,0, "You are dead", 32);
+            text.screenCenter();
+            add(text);
+        }
+            
 
         var y = 300;
         if (GameMessages.MessageLog._messages.length > 0)
@@ -127,10 +138,23 @@ class PlayState extends FlxState
         super.update(elapsed);
 	}
 
+    function kills(): Void
+    {
+        for (e in entities)
+        {
+            if (e.dead){
+                //remove
+                entities.remove(e);
+                e.kill();
+                entities_group.remove(e);
+            }
+        }
+    }
+
+
     //movement
     function updatePlayer():Void
     {
-        
         if (FlxG.keys.anyJustPressed([LEFT, H]))
         {
             if (player.getActorAtLoc(player._x-1, player._y, entities) != null)

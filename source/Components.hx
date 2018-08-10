@@ -16,6 +16,11 @@ class Actor {
 
     public function takeDamage(amount:Int):Void {
         _hp -= amount;
+
+        if (_hp <= 0)
+        {
+            this.owner.dead = true;
+        }
     }
 
     public function attack(target:Entity):Void {
