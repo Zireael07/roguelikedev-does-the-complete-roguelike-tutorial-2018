@@ -38,3 +38,9 @@ Very simple UI is drawn and ignores camera movement.
 Moved all the entity sprites to separate group to make working with them easier.
 
 I implemented the simplest save/load possible by using FlxSave and saving only the positions. For more complex games, serializing the Entity class will be necessary.
+
+## Week 8
+
+To share a HaxeFlixel game on GH pages, copy the export/html5/bin folder's contents into /docs and configure GH pages to be sourced from /docs.
+
+The GH page for this repository is available at https://zireael07.github.io/roguelikedev-does-the-complete-roguelike-tutorial-2018/
